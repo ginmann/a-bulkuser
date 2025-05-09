@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -9,14 +10,65 @@ import { useToast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
 
+// Helper to generate more users
+const generateSampleUsers = (count: number, existingUsers: User[]): User[] => {
+  const newUsers: User[] = [];
+  const firstNames = ["James", "Mary", "Robert", "Patricia", "John", "Jennifer", "Michael", "Linda", "David", "Elizabeth", "William", "Barbara", "Richard", "Susan", "Joseph", "Jessica", "Thomas", "Sarah", "Charles", "Karen"];
+  const lastNames = ["Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson", "Thomas", "Taylor", "Moore", "Martin", "Jackson", "Thompson", "White", "Harris"];
+  const departments = ["Cardiology", "Pediatrics", "Oncology", "Neurology", "Radiology", "Surgery", "Emergency", "Internal Medicine", "Orthopedics", "Pharmacy"];
+  const mfaPolicies: MfaPolicy[] = ["Low", "Medium", "High"];
+  
+  const existingUsernames = new Set(existingUsers.map(u => u.username));
+  const existingEmails = new Set(existingUsers.map(u => u.email));
+
+  let attempts = 0; // To avoid infinite loop if we run out of unique names
+
+  for (let i = 0; i < count && attempts < count * 5; i++) {
+    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+    let username = `${firstName.toLowerCase().charAt(0)}${lastName.toLowerCase()}${Math.floor(Math.random() * 100)}`;
+    let email = `${firstName.toLowerCase()}.${lastName.toLowerCase()}${Math.floor(Math.random() * 100)}@example.com`;
+
+    // Ensure username and email are unique
+    while (existingUsernames.has(username)) {
+      username = `${firstName.toLowerCase().charAt(0)}${lastName.toLowerCase()}${Math.floor(Math.random() * 1000)}`;
+      attempts++;
+    }
+    while (existingEmails.has(email)) {
+      email = `${firstName.toLowerCase()}.${lastName.toLowerCase()}${Math.floor(Math.random() * 1000)}@example.com`;
+      attempts++;
+    }
+    if (attempts >= count * 5) break; // Break if too many attempts
+
+    existingUsernames.add(username);
+    existingEmails.add(email);
+
+    newUsers.push({
+      id: String(Date.now() + Math.random() + i + existingUsers.length),
+      username,
+      firstName,
+      lastName,
+      email,
+      department: departments[Math.floor(Math.random() * departments.length)],
+      mfaPolicy: mfaPolicies[Math.floor(Math.random() * mfaPolicies.length)],
+      identityMapping: `${Math.random() > 0.5 ? "AD" : "LDAP"}:${username}`,
+    });
+  }
+  return newUsers;
+};
+
+
 // Initial mock data
-const initialUsers: User[] = [
+const baseUsers: User[] = [
   { id: "1", username: "asmith", firstName: "Alice", lastName: "Smith", email: "alice.smith@example.com", department: "Cardiology", mfaPolicy: "High", identityMapping: "AD:asmith" },
   { id: "2", username: "bjohnson", firstName: "Bob", lastName: "Johnson", email: "bob.johnson@example.com", department: "Pediatrics", mfaPolicy: "Medium", identityMapping: "LDAP:bjohnson" },
   { id: "3", username: "cwilliams", firstName: "Carol", lastName: "Williams", email: "carol.williams@example.com", department: "Oncology", mfaPolicy: "Low", identityMapping: "AD:cwilliams" },
   { id: "4", username: "davisj", firstName: "David", lastName: "Davis", email: "david.davis@example.com", department: "Neurology", mfaPolicy: "Medium", identityMapping: "INTERNAL:davisj" },
   { id: "5", username: "emartin", firstName: "Emily", lastName: "Martin", email: "emily.martin@example.com", department: "Radiology", mfaPolicy: "High", identityMapping: "AD:emartin" },
 ];
+
+const initialUsers = [...baseUsers, ...generateSampleUsers(50, baseUsers)];
+
 
 export default function MediViewAdminPage() {
   const [users, setUsers] = useState<User[]>([]);
@@ -105,6 +157,15 @@ export default function MediViewAdminPage() {
       </header>
 
       <main className="flex-1 container mx-auto p-4 md:p-8 space-y-8">
+        <section aria-labelledby="ai-recommendations-heading">
+          <h2 id="ai-recommendations-heading" className="text-2xl font-semibold tracking-tight mb-6">
+            System Security Insights
+          </h2>
+          <AiRecommendations allUsers={users} />
+        </section>
+
+        <Separator className="my-8" />
+
         <section aria-labelledby="user-management-heading">
            <h2 id="user-management-heading" className="text-2xl font-semibold tracking-tight mb-6">
             User Management
@@ -115,15 +176,6 @@ export default function MediViewAdminPage() {
             onDeleteUsers={handleDeleteUsers}
             onBulkUpdateUsers={handleBulkUpdateUsers}
           />
-        </section>
-        
-        <Separator className="my-8" />
-
-        <section aria-labelledby="ai-recommendations-heading">
-          <h2 id="ai-recommendations-heading" className="text-2xl font-semibold tracking-tight mb-6">
-            System Security Insights
-          </h2>
-          <AiRecommendations />
         </section>
       </main>
 
@@ -137,3 +189,5 @@ export default function MediViewAdminPage() {
     </div>
   );
 }
+
+    
