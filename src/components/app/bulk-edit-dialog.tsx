@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,7 +10,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -26,6 +25,7 @@ interface BulkEditDialogProps {
   onOpenChange: (open: boolean) => void;
   selectedUserCount: number;
   onBulkEdit: (field: "mfaPolicy" | "department", value: string) => void;
+  availableDepartments: string[];
 }
 
 type EditableField = "mfaPolicy" | "department";
@@ -35,30 +35,43 @@ export function BulkEditDialog({
   onOpenChange,
   selectedUserCount,
   onBulkEdit,
+  availableDepartments,
 }: BulkEditDialogProps) {
   const [fieldToEdit, setFieldToEdit] = useState<EditableField>("department");
-  const [departmentValue, setDepartmentValue] = useState("");
+  const [selectedDepartment, setSelectedDepartment] = useState<string>("");
   const [mfaPolicyValue, setMfaPolicyValue] = useState<MfaPolicy>("Medium");
+
+  useEffect(() => {
+    if (isOpen) {
+      // Reset department selection when dialog opens or fieldToEdit changes
+      if (fieldToEdit === "department" && availableDepartments.length > 0) {
+        setSelectedDepartment(availableDepartments[0]);
+      } else {
+        setSelectedDepartment("");
+      }
+      // Reset MFA policy to default when dialog opens
+      setMfaPolicyValue("Medium");
+    }
+  }, [isOpen, fieldToEdit, availableDepartments]);
 
   const handleSave = () => {
     if (fieldToEdit === "department") {
-      if (departmentValue.trim() === "") return; // Basic validation
-      onBulkEdit("department", departmentValue);
+      if (selectedDepartment === "") return; 
+      onBulkEdit("department", selectedDepartment);
     } else {
       onBulkEdit("mfaPolicy", mfaPolicyValue);
     }
     onOpenChange(false);
-    setDepartmentValue(""); // Reset for next time
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Bulk Edit Users</DialogTitle>
+          <DialogTitle>Edit Users</DialogTitle>
           <DialogDescription>
             Update {selectedUserCount} selected user(s). Choose a field and
-            enter the new value.
+            select or enter the new value.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -70,7 +83,7 @@ export function BulkEditDialog({
               value={fieldToEdit}
               onValueChange={(value) => setFieldToEdit(value as EditableField)}
             >
-              <SelectTrigger className="col-span-3">
+              <SelectTrigger className="col-span-3" id="field">
                 <SelectValue placeholder="Select field to edit" />
               </SelectTrigger>
               <SelectContent>
@@ -84,13 +97,26 @@ export function BulkEditDialog({
               <Label htmlFor="departmentValue" className="text-right">
                 Department
               </Label>
-              <Input
-                id="departmentValue"
-                value={departmentValue}
-                onChange={(e) => setDepartmentValue(e.target.value)}
-                className="col-span-3"
-                placeholder="Enter new department"
-              />
+              <Select
+                value={selectedDepartment}
+                onValueChange={setSelectedDepartment}
+                disabled={availableDepartments.length === 0}
+              >
+                <SelectTrigger id="departmentValue" className="col-span-3">
+                  <SelectValue placeholder="Select new department" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableDepartments.length > 0 ? (
+                    availableDepartments.map((dept) => (
+                      <SelectItem key={dept} value={dept}>
+                        {dept}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="" disabled>No departments available</SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
             </div>
           )}
           {fieldToEdit === "mfaPolicy" && (
@@ -120,7 +146,11 @@ export function BulkEditDialog({
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button type="button" onClick={handleSave}>
+          <Button 
+            type="button" 
+            onClick={handleSave}
+            disabled={fieldToEdit === "department" && selectedDepartment === "" && availableDepartments.length > 0}
+          >
             Save Changes
           </Button>
         </DialogFooter>

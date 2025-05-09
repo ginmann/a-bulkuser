@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { User, MfaPolicy, mfaPolicyOptions } from "@/types";
 import {
   Table,
@@ -61,6 +61,11 @@ export function UserTable({
   const selectTriggerRef = useRef<HTMLButtonElement | null>(null);
 
   const { toast } = useToast();
+
+  const availableDepartments = useMemo(() => {
+    const departments = new Set(users.map(user => user.department));
+    return Array.from(departments).sort();
+  }, [users]);
 
   useEffect(() => {
     if (editingCell && inputRef.current) {
@@ -204,7 +209,7 @@ export function UserTable({
             </AlertDialogContent>
           </AlertDialog>
           <Button variant="outline" size="sm" onClick={() => setIsBulkEditDialogOpen(true)}>
-            <Edit3 className="mr-2 h-4 w-4" /> Bulk Edit
+            <Edit3 className="mr-2 h-4 w-4" /> Edit
           </Button>
         </div>
       )}
@@ -272,6 +277,7 @@ export function UserTable({
         onOpenChange={setIsBulkEditDialogOpen}
         selectedUserCount={selectedUserIds.size}
         onBulkEdit={handleBulkEdit}
+        availableDepartments={availableDepartments}
       />
     </div>
   );
