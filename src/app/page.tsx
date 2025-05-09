@@ -13,9 +13,9 @@ import Image from "next/image";
 // Helper to generate more users
 const generateSampleUsers = (count: number, existingUsers: User[]): User[] => {
   const newUsers: User[] = [];
-  const firstNames = ["James", "Mary", "Robert", "Patricia", "John", "Jennifer", "Michael", "Linda", "David", "Elizabeth", "William", "Barbara", "Richard", "Susan", "Joseph", "Jessica", "Thomas", "Sarah", "Charles", "Karen"];
-  const lastNames = ["Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson", "Thomas", "Taylor", "Moore", "Martin", "Jackson", "Thompson", "White", "Harris"];
-  const departments = ["Cardiology", "Pediatrics", "Oncology", "Neurology", "Radiology", "Surgery", "Emergency", "Internal Medicine", "Orthopedics", "Pharmacy"];
+  const firstNames = ["James", "Mary", "Robert", "Patricia", "John", "Jennifer", "Michael", "Linda", "David", "Elizabeth", "William", "Barbara", "Richard", "Susan", "Joseph", "Jessica", "Thomas", "Sarah", "Charles", "Karen", "Daniel", "Nancy", "Matthew", "Lisa", "Anthony", "Betty", "Donald", "Dorothy", "Mark", "Sandra", "Paul", "Ashley", "Steven", "Kimberly", "Andrew", "Donna", "Kenneth", "Emily", "George", "Carol", "Joshua", "Michelle", "Kevin", "Amanda", "Brian", "Melissa", "Edward", "Deborah", "Ronald", "Stephanie", "Timothy", "Rebecca", "Jason", "Laura", "Jeffrey", "Sharon", "Ryan", "Cynthia"];
+  const lastNames = ["Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson", "Thomas", "Taylor", "Moore", "Martin", "Jackson", "Thompson", "White", "Harris", "Sanchez", "Clark", "Ramirez", "Lewis", "Robinson", "Walker", "Young", "Allen", "King", "Wright", "Scott", "Green", "Baker", "Adams", "Nelson", "Hill", "Campbell", "Mitchell", "Roberts", "Carter", "Phillips", "Evans", "Turner", "Torres", "Parker", "Collins", "Edwards", "Stewart", "Flores", "Morris", "Nguyen", "Murphy", "Rivera", "Cook", "Rogers", "Morgan", "Peterson", "Cooper", "Reed", "Bailey"];
+  const departments = ["Cardiology", "Pediatrics", "Oncology", "Neurology", "Radiology", "Surgery", "Emergency", "Internal Medicine", "Orthopedics", "Pharmacy", "Psychiatry", "Dermatology", "Urology", "Ophthalmology", "Anesthesiology", "Pathology", "Physical Therapy", "Nutrition", "Human Resources", "IT Support"];
   const mfaPolicies: MfaPolicy[] = ["Low", "Medium", "High"];
   
   const existingUsernames = new Set(existingUsers.map(u => u.username));
@@ -67,7 +67,7 @@ const baseUsers: User[] = [
   { id: "5", username: "emartin", firstName: "Emily", lastName: "Martin", email: "emily.martin@example.com", department: "Radiology", mfaPolicy: "High", identityMapping: "AD:emartin" },
 ];
 
-const initialUsers = [...baseUsers, ...generateSampleUsers(50, baseUsers)];
+const initialUsers = [...baseUsers, ...generateSampleUsers(100, baseUsers)]; // Increased to 100 (50 + 50)
 
 
 export default function MediViewAdminPage() {
@@ -148,7 +148,7 @@ export default function MediViewAdminPage() {
               <path d="m6.05 6.53 11.9-.02"/><path d="m19.52 17.24-15.04.04"/>
               <path d="M6.05 17.47 12 14.02l6.02-3.48"/><path d="M17.98 6.24 12 9.72l-5.95-3.48"/>
             </svg>
-            <span className="ml-2 text-xl font-bold">MediView Admin</span>
+            <span className="ml-2 text-xl font-bold">User Admin Prototype</span>
           </div>
           <div className="flex flex-1 items-center justify-end space-x-2">
              <AddUserDialog onAddUser={handleAddUser} />
@@ -182,7 +182,7 @@ export default function MediViewAdminPage() {
       <footer className="py-6 md:px-8 md:py-0 border-t">
         <div className="container flex flex-col items-center justify-between gap-4 md:h-20 md:flex-row">
           <p className="text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} MediView Inc. All rights reserved.
+            &copy; {new Date().getFullYear()} Your Company Inc. All rights reserved.
           </p>
         </div>
       </footer>

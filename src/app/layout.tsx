@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'MediView Admin',
-  description: 'Manage users in your healthcare EHR system.',
+  title: 'User Admin Prototype',
+  description: 'Manage users and security with AI-powered insights.',
 };
 
 export default function RootLayout({
