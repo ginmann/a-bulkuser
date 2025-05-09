@@ -1,23 +1,7 @@
-import type {NextConfig} from 'next';
+/** @type {import('next').NextConfig} */
+  const nextConfig = {
+    output: 'export', // VERY IMPORTANT
+    // ... other configurations
+  };
 
-const nextConfig: NextConfig = {
-  /* config options here */
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'picsum.photos',
-        port: '',
-        pathname: '/**',
-      },
-    ],
-  },
-};
-
-export default nextConfig;
+  export default nextConfig;
