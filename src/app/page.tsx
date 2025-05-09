@@ -9,6 +9,7 @@ import { AiRecommendations } from "@/components/app/ai-recommendations";
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
+import { ImportCsvDialog } from "@/components/app/import-csv-dialog"; // Import the new dialog
 
 // Helper to generate more users
 const generateSampleUsers = (count: number, existingUsers: User[]): User[] => {
@@ -67,10 +68,10 @@ const baseUsers: User[] = [
   { id: "5", username: "emartin", firstName: "Emily", lastName: "Martin", email: "emily.martin@example.com", department: "Radiology", mfaPolicy: "High", identityMapping: "AD:emartin" },
 ];
 
-const initialUsers = [...baseUsers, ...generateSampleUsers(100, baseUsers)]; // Increased to 100 (50 + 50)
+const initialUsers = [...baseUsers, ...generateSampleUsers(150, baseUsers)]; // Increased to 150 (5 + 145)
 
 
-export default function MediViewAdminPage() {
+export default function UserAdminPrototypePage() {
   const [users, setUsers] = useState<User[]>([]);
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
@@ -121,6 +122,15 @@ export default function MediViewAdminPage() {
     // Toast is handled in UserTable
   };
 
+  const handleImportUsers = (importedUsers: Omit<User, "id">[]) => {
+    const newUsersWithIds = importedUsers.map(user => ({
+      ...user,
+      id: String(Date.now() + Math.random() + users.length) // Ensure unique ID
+    }));
+    setUsers(prevUsers => [...prevUsers, ...newUsersWithIds]);
+    toast({ title: "Users Imported", description: `${importedUsers.length} users have been imported successfully.` });
+  };
+
   if (!isClient) {
     // Render a loading state or null on the server to avoid hydration mismatch
     return (
@@ -151,6 +161,7 @@ export default function MediViewAdminPage() {
             <span className="ml-2 text-xl font-bold">User Admin Prototype</span>
           </div>
           <div className="flex flex-1 items-center justify-end space-x-2">
+             <ImportCsvDialog onImportUsers={handleImportUsers} />
              <AddUserDialog onAddUser={handleAddUser} />
           </div>
         </div>
